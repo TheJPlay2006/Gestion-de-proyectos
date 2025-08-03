@@ -268,7 +268,6 @@ public class FormularioRecurso extends JDialog {
         }
     }
 
-
     public boolean isAceptado() {
         return aceptado;
     }
