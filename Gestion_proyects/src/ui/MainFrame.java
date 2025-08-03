@@ -3,9 +3,9 @@ package ui;
 import javax.swing.*;
 import java.awt.*;
 import ui.componentes.TablaProyectos;
-import ui.componentes.TablaTareas; // Asegúrate de tener esta clase
-import ui.componentes.TablaUsuarios; // Asegúrate de tener esta clase
-import ui.componentes.TablaRecursos; // Asegúrate de tener esta clase
+import ui.componentes.TablaTareas;
+import ui.componentes.TablaUsuarios; 
+import ui.componentes.TablaRecursos; 
 
 public class MainFrame extends JFrame {
     private JMenuBar menuBar;
@@ -19,20 +19,21 @@ public class MainFrame extends JFrame {
     private JPanel recursosPanel;
 
     public MainFrame() {
-        // Establecer el look and feel del sistema
         try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             System.err.println("No se pudo establecer el look and feel del sistema: " + e.getMessage());
         }
-        
+
         initComponents();
         setupLayout();
         setupEventHandlers();
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Gestor de Proyectos - Jairo Herrera");
         setSize(1200, 800);
         setLocationRelativeTo(null);
-        // setExtendedState(JFrame.MAXIMIZED_BOTH); // Opcional
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     private void initComponents() {
@@ -70,7 +71,7 @@ public class MainFrame extends JFrame {
         editarMenu.add(copiarItem);
         editarMenu.add(pegarItem);
 
-        // Menú Ver
+        // Menú Ver 
         JMenu verMenu = new JMenu("Ver");
         JMenuItem actualizarItem = new JMenuItem("Actualizar");
         JCheckBoxMenuItem barraHerramientasItem = new JCheckBoxMenuItem("Barra de Herramientas", true);
@@ -155,7 +156,6 @@ public class MainFrame extends JFrame {
         toolBar.add(actualizarBtn);
         toolBar.add(eliminarBtn);
         toolBar.addSeparator();
-
         toolBar.add(Box.createHorizontalGlue());
 
         // Cambiar el nombre de usuario
@@ -201,10 +201,10 @@ public class MainFrame extends JFrame {
 
         // Crear paneles para cada pestaña usando componentes reales conectados a BD
         dashboardPanel = createDashboardPanel();
-        proyectosPanel = createProyectosPanel(); // Panel real
-        tareasPanel = createTareasPanel();       // Panel real
-        usuariosPanel = createUsuariosPanel();   // Panel real
-        recursosPanel = createRecursosPanel();   // Panel real
+        proyectosPanel = createProyectosPanel(); 
+        tareasPanel = createTareasPanel();    
+        usuariosPanel = createUsuariosPanel();   
+        recursosPanel = createRecursosPanel();  
 
         mainTabbedPane.addTab("Dashboard", dashboardPanel);
         mainTabbedPane.addTab("Proyectos", proyectosPanel);
@@ -220,22 +220,23 @@ public class MainFrame extends JFrame {
         // Obtener datos reales para el resumen
         service.ProyectoServicio proyectoServicio = new service.ProyectoServicio();
         service.TareaServicio tareaServicio = new service.TareaServicio();
-        
+
         int totalProyectos = 0;
         int proyectosActivos = 0;
         int tareasPendientes = 0;
         int tareasCompletadas = 0;
-        
+
         try {
             totalProyectos = proyectoServicio.obtenerTodosLosProyectos().size();
-            // Contar proyectos activos (no completados)
+            // Contar proyectos activos
             proyectosActivos = (int) proyectoServicio.obtenerTodosLosProyectos().stream()
                                  .filter(p -> !"Completado".equals(p.getEstado()) && !"Hecho".equals(p.getEstado()))
                                  .count();
-                                 
+
             tareasPendientes = (int) tareaServicio.obtenerTodasLasTareas().stream()
                                  .filter(t -> !"Hecho".equals(t.getEstado()))
                                  .count();
+
             tareasCompletadas = (int) tareaServicio.obtenerTodasLasTareas().stream()
                                  .filter(t -> "Hecho".equals(t.getEstado()))
                                  .count();
@@ -260,7 +261,7 @@ public class MainFrame extends JFrame {
         // Para tablas reales de proyectos recientes y tareas pendientes,
         // necesitarías crear componentes personalizados similares a TablaProyectos
         // Por ahora, dejamos las tablas estáticas o puedes crear componentes específicos
-        
+
         JPanel proyectosRecientesPanel = new JPanel(new BorderLayout());
         proyectosRecientesPanel.setBorder(BorderFactory.createTitledBorder("Proyectos Recientes"));
         proyectosRecientesPanel.add(new JScrollPane(createProyectosTable()), BorderLayout.CENTER);
@@ -293,7 +294,6 @@ public class MainFrame extends JFrame {
 
         card.add(numberLabel, BorderLayout.CENTER);
         card.add(textLabel, BorderLayout.SOUTH);
-
         return card;
     }
 
@@ -369,12 +369,11 @@ public class MainFrame extends JFrame {
         // Manejadores de eventos para menús y botones
     }
 
-    // --- Métodos para manejar eventos ---
+    //Métodos para manejar eventos
     private void crearNuevoProyecto() {
         try {
             ui.componentes.FormularioProyecto dialog = new ui.componentes.FormularioProyecto(SwingUtilities.getWindowAncestor(this), null);
             dialog.setVisible(true);
-            
             if (dialog.isAceptado()) {
                 // Refrescar la tabla de proyectos si es la pestaña activa
                 if (mainTabbedPane.getSelectedIndex() == 1) { // Índice de la pestaña Proyectos
@@ -393,10 +392,9 @@ public class MainFrame extends JFrame {
         int selectedIndex = mainTabbedPane.getSelectedIndex();
         try {
             switch (selectedIndex) {
-                case 0: // Dashboard
-                    // Opcional: Recalcular y actualizar datos del dashboard
-                    // dashboardPanel = createDashboardPanel(); // Re-crear el panel
-                    // mainTabbedPane.setComponentAt(0, dashboardPanel);
+                case 0:
+                     dashboardPanel = createDashboardPanel();
+                     mainTabbedPane.setComponentAt(0, dashboardPanel);
                     JOptionPane.showMessageDialog(this, "Datos del dashboard actualizados (simulado).", "Actualizar", JOptionPane.INFORMATION_MESSAGE);
                     break;
                 case 1: // Proyectos
@@ -457,13 +455,4 @@ public class MainFrame extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new MainFrame().setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 }
