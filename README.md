@@ -162,23 +162,6 @@ java --enable-native-access=ALL-UNNAMED -jar dist/Gestion-de-proyectos.jar
 7. Haz clic en **OK**.
 8. Haz clic derecho en el proyecto y selecciona **Run** o presiona **F6**.
 
-## 📷 Capturas de Pantalla
-
-*(Agrega aquí capturas de pantalla de diferentes partes de tu aplicación cuando las tengas)*
-
-<!---
-<div align="center">
-  <img src="screenshots/proyectos.png" alt="Gestión de Proyectos" width="600"/>
-  <p><em>Gestión de Proyectos</em></p>
-  
-  <img src="screenshots/tareas.png" alt="Gestión de Tareas" width="600"/>
-  <p><em>Gestión de Tareas</em></p>
-  
-  <img src="screenshots/formulario_proyecto.png" alt="Formulario de Proyecto" width="400"/>
-  <p><em>Formulario para Crear/Editar Proyecto</em></p>
-</div>
--->
-
 ## 📁 Entregables
 
 Este repositorio contiene:
