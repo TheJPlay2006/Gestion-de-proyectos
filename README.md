@@ -61,7 +61,8 @@ Gestion-de-proyectos/
 │       ├── dao/                 # Data Access Objects
 │       │   ├── UsuarioDAO.java
 │       │   ├── ProyectoDAO.java
-│       │   └── TareaDAO.java
+│       │   ├── TareaDAO.java
+│       │   └── RecursoDAO.java
 │       ├── database/            # Utilidades de base de datos
 │       │   └── ConexionBD.java
 │       ├── model/               # Clases POJO
@@ -71,15 +72,18 @@ Gestion-de-proyectos/
 │       │   └── Recurso.java
 │       ├── service/             # Lógica de negocio
 │       │   ├── UsuarioServicio.java
-│       │   └── ProyectoServicio.java
+│       │   ├── ProyectoServicio.java
+│       │   └── TareaServicio.java
 │       └── ui/                  # Interfaz de usuario
 │           ├── MainFrame.java
 │           └── componentes/     # Componentes específicos
 │               ├── TablaProyectos.java
 │               └── FormularioProyecto.java
-├── lib/                         # Librerías JAR externas
+├── lib/                         # Librerías JAR externas (JDBC Driver)
 ├── build/                       # Archivos compilados
 ├── dist/                        # JAR ejecutable generado
+├── bd/                          # Scripts de base de datos
+│   └── script_bd.sql            # Script completo de creación
 ├── nbproject/                   # Configuración NetBeans
 ├── build.xml                    # Script construcción Ant
 └── README.md                    # Este archivo
@@ -109,20 +113,101 @@ cd Gestion-de-proyectos
 
 1. **Abre SQL Server Management Studio (SSMS)**
 2. **Conéctate a tu instancia local** (ejemplo: `JPLAYLAPTOP\SQLEXPRESS`)
-3. **Crea la base de datos**:
+3. **Ejecuta el siguiente script SQL completo**:
 
 ```sql
-USE [master]
-GO
+-- Crear la base de datos si no existe
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'GestorProyectosDB')
 BEGIN
-    CREATE DATABASE [GestorProyectosDB]
+    CREATE DATABASE GestorProyectosDB;
+    PRINT '✅ Base de datos GestorProyectosDB creada.';
+END
+ELSE
+BEGIN
+    PRINT 'ℹ️  La base de datos GestorProyectosDB ya existe.';
 END
 GO
-USE [GestorProyectosDB]
+
+-- Usar la base de datos
+USE GestorProyectosDB;
 GO
 
--- Crear tablas: Usuarios, Proyectos, Tareas, Recursos, RegistroErrores
+-- Tabla de Usuarios
+CREATE TABLE Usuarios (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre_usuario NVARCHAR(50) NOT NULL UNIQUE,
+    nombre_completo NVARCHAR(100) NOT NULL,
+    correo_electronico NVARCHAR(100),
+    fecha_creacion DATETIME DEFAULT GETDATE()
+);
+
+-- Tabla de Proyectos
+CREATE TABLE Proyectos (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100) NOT NULL,
+    descripcion NVARCHAR(MAX),
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    estado NVARCHAR(20) DEFAULT 'No Iniciado' CHECK (estado IN ('No Iniciado', 'En Progreso', 'Completado', 'En Espera')),
+    fecha_creacion DATETIME DEFAULT GETDATE()
+);
+
+-- Tabla de Tareas
+CREATE TABLE Tareas (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    proyecto_id INT NOT NULL,
+    titulo NVARCHAR(100) NOT NULL,
+    descripcion NVARCHAR(MAX),
+    asignado_a INT, -- FK a Usuarios
+    estado NVARCHAR(20) DEFAULT 'Por Hacer' CHECK (estado IN ('Por Hacer', 'En Progreso', 'Revisión', 'Hecho')),
+    prioridad NVARCHAR(10) DEFAULT 'Media' CHECK (prioridad IN ('Baja', 'Media', 'Alta')),
+    fecha_inicio DATE,
+    fecha_vencimiento DATE,
+    fecha_completado DATE,
+    fecha_creacion DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (proyecto_id) REFERENCES Proyectos(id) ON DELETE CASCADE,
+    FOREIGN KEY (asignado_a) REFERENCES Usuarios(id)
+);
+
+-- Tabla de Recursos
+CREATE TABLE Recursos (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    tarea_id INT NOT NULL,
+    nombre_recurso NVARCHAR(100) NOT NULL,
+    tipo_recurso NVARCHAR(50), -- Documento, Enlace, Nota, etc.
+    ruta_recurso NVARCHAR(255), -- Ruta o URL del recurso
+    fecha_subida DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (tarea_id) REFERENCES Tareas(id) ON DELETE CASCADE
+);
+
+-- Tabla de Logs de Errores
+CREATE TABLE RegistroErrores (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    mensaje_error NVARCHAR(MAX),
+    nombre_metodo NVARCHAR(100),
+    detalles_error NVARCHAR(MAX),
+    fecha_registro DATETIME DEFAULT GETDATE()
+);
+
+-- Insertar datos de ejemplo
+INSERT INTO Usuarios (nombre_usuario, nombre_completo, correo_electronico) VALUES
+('juan_dev', 'Juan Pérez', 'juan.perez@example.com'),
+('ana_mgr', 'Ana Gómez', 'ana.gomez@example.com');
+
+INSERT INTO Proyectos (nombre, descripcion, fecha_inicio, fecha_fin) VALUES
+('Sistema de Inventario', 'Desarrollo de un sistema para control de inventario', '2024-06-01', '2024-08-31'),
+('Campaña Marketing', 'Campaña digital para lanzamiento de producto', '2024-07-01', '2024-09-30');
+
+INSERT INTO Tareas (proyecto_id, titulo, descripcion, asignado_a, estado, prioridad, fecha_inicio, fecha_vencimiento) VALUES
+(1, 'Diseño de Base de Datos', 'Crear modelo ER y scripts SQL', 1, 'En Progreso', 'Alta', '2024-06-01', '2024-06-15'),
+(1, 'Implementar API REST', 'Desarrollar endpoints para CRUD', 1, 'Por Hacer', 'Alta', '2024-06-16', '2024-07-15'),
+(2, 'Crear Banners', 'Diseñar creatividades para redes sociales', 2, 'Hecho', 'Media', '2024-07-01', '2024-07-10');
+
+INSERT INTO Recursos (tarea_id, nombre_recurso, tipo_recurso, ruta_recurso) VALUES
+(1, 'Modelo_ER.pdf', 'Documento', '/recursos/Modelo_ER.pdf'),
+(3, 'Banners.zip', 'Documento', '/recursos/Banners.zip');
+
+PRINT '🏁 Script de creación de base de datos ejecutado correctamente.';
 ```
 
 4. **Configura la autenticación** (Windows Authentication recomendada)
