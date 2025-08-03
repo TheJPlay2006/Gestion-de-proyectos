@@ -171,11 +171,6 @@ Este repositorio contiene:
 * ✅ Clase principal `Main.Main`.
 * ✅ Estructura de paquetes `dao`, `database`, `model`, `service`, `ui`.
 * ✅ Este archivo `README.md`.
-* ✅ (Próximamente) Archivo JAR ejecutable en `dist/` tras construir con Ant.
-* ✅ (Próximamente) Scripts SQL (`schema.sql`).
-* ✅ (Próximamente) Backup de la base de datos.
-* ✅ (Próximamente) Modelo UML de las entidades.
-* ✅ (Próximamente) Video de demostración.
 
 ## 🔧 Comandos Ant Disponibles
 
