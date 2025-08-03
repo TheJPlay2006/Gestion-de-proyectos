@@ -8,13 +8,35 @@
 
 > Aplicación de escritorio desarrollada en Java Swing para la gestión integral de proyectos de software, con arquitectura MVC y base de datos SQL Server.
 
+## 💾 Esquema de Base de Datos
+
+### 📊 Tablas Principales
+
+| Tabla | Descripción | Campos Clave |
+|-------|-------------|--------------|
+| **Usuarios** | Gestión de usuarios del sistema | `id`, `nombre_usuario`, `nombre_completo`, `correo_electronico` |
+| **Proyectos** | Información de proyectos | `id`, `nombre`, `descripcion`, `estado`, `fecha_inicio`, `fecha_fin` |
+| **Tareas** | Tareas asociadas a proyectos | `id`, `proyecto_id`, `titulo`, `asignado_a`, `estado`, `prioridad` |
+| **Recursos** | Recursos adjuntos a tareas | `id`, `tarea_id`, `nombre_recurso`, `tipo_recurso`, `ruta_recurso` |
+| **RegistroErrores** | Log de errores del sistema | `id`, `mensaje_error`, `nombre_metodo`, `fecha_registro` |
+
+### 🔗 Relaciones
+- `Tareas.proyecto_id` → `Proyectos.id` (CASCADE DELETE)
+- `Tareas.asignado_a` → `Usuarios.id`
+- `Recursos.tarea_id` → `Tareas.id` (CASCADE DELETE)
+
+### 📈 Estados del Sistema
+- **Proyectos**: `No Iniciado`, `En Progreso`, `Completado`, `En Espera`
+- **Tareas**: `Por Hacer`, `En Progreso`, `Revisión`, `Hecho`
+- **Prioridades**: `Baja`, `Media`, `Alta`
+
 ---
 
 ## 📝 Descripción
 
 Aplicación de escritorio desarrollada en **Java Swing** para la gestión integral de proyectos. Permite organizar proyectos, asignar y hacer seguimiento de tareas, gestionar usuarios y recursos asociados, conectándose a una base de datos **Microsoft SQL Server** mediante **JDBC**.
 
-Este proyecto fue creado como práctica para la asignatura **Programación I** de la carrera Técnico Universitario en Informática (**UTN ITI-221**).
+Este proyecto fue creado como práctica para la asignatura **Programación I** de la carrera **Ingeniería en Tecnologías de la Información** de la **Universidad Técnica Nacional (UTN)**.
 
 ---
 
@@ -277,13 +299,14 @@ ant test           # Ejecuta pruebas unitarias
 ## 🎓 Información Académica
 
 ### 👨‍🎓 Autor
-**Jairo Steven Herrera Romero**  
-Estudiante de Técnico Universitario en Informática  
+**Jairo Herrera Romero**  
+Estudiante de Ingeniería en Tecnologías de la Información  
 Universidad Técnica Nacional (UTN)
 
 ### 📚 Contexto Académico
 - **Asignatura**: Programación I
-- **Código**: UTN ITI-221
+- **Carrera**: Ingeniería en Tecnologías de la Información
+- **Universidad**: Universidad Técnica Nacional (UTN)
 - **Propósito**: Proyecto práctico de gestión de software
 
 ---
